@@ -111,6 +111,7 @@ The tool flags concerning patterns:
 | [cc-health-check](https://github.com/yurukusa/cc-health-check) | Is your AI **setup** safe? |
 | **cc-session-stats** | How much are you **using** AI? |
 | [cc-audit-log](https://github.com/yurukusa/cc-audit-log) | What did your AI **do**? |
+| [cc-cost-check](https://github.com/yurukusa/cc-cost-check) | Cost per commit calculator |
 
 ## License
 
