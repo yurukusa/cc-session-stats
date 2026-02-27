@@ -1,0 +1,33 @@
+{
+  "name": "cc-session-stats",
+  "version": "1.0.0",
+  "description": "See how much time you actually spend with Claude Code. Session durations, daily patterns, health warnings.",
+  "bin": {
+    "cc-session-stats": "./cli.mjs"
+  },
+  "type": "module",
+  "keywords": [
+    "claude-code",
+    "claude",
+    "ai",
+    "session",
+    "stats",
+    "health",
+    "productivity",
+    "time-tracking"
+  ],
+  "author": "yurukusa",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yurukusa/cc-session-stats"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "cli.mjs",
+    "README.md",
+    "LICENSE"
+  ]
+}
