@@ -75,9 +75,13 @@ The tool flags concerning patterns:
 | Average session > 2 hours | 90-minute focus blocks are backed by research |
 | 6+ hours/day average | That's a full workday of sitting |
 
-## Companion tool
+## The cc-toolkit trilogy
 
-**[cc-health-check](https://github.com/yurukusa/cc-health-check)** — Diagnostic for your Claude Code *setup* (hooks, CLAUDE.md, monitoring). Session-stats checks your *usage patterns*.
+| Tool | What it checks |
+|------|---------------|
+| [cc-health-check](https://github.com/yurukusa/cc-health-check) | Is your AI **setup** safe? |
+| **cc-session-stats** | How much are you **using** AI? |
+| [cc-audit-log](https://github.com/yurukusa/cc-audit-log) | What did your AI **do**? |
 
 ## License
 
