@@ -272,6 +272,49 @@ function analyze(sessions) {
   };
 }
 
+// ── JSON output ─────────────────────────────────────────────────
+
+function buildJsonOutput(stats) {
+  const dowNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const hoursByDayOfWeek = {};
+  for (let i = 0; i < 7; i++) {
+    hoursByDayOfWeek[dowNames[i]] = Math.round(stats.dowHours[i] * 100) / 100;
+  }
+
+  const topProjects = Object.entries(stats.projectHours)
+    .sort((a, b) => b[1] - a[1])
+    .map(([name, hours]) => ({ name, hours: Math.round(hours * 100) / 100 }));
+
+  const ms = stats.maxSession;
+
+  return {
+    version: '1.0',
+    totalSessions: stats.totalSessions,
+    totalHours: Math.round(stats.totalHours * 100) / 100,
+    activeDays: stats.activeDays.length,
+    totalDaysSpan: stats.totalDaysSpan,
+    firstSeen: stats.firstDay,
+    lastSeen: stats.lastDay,
+    averages: {
+      perSession: Math.round(stats.avgDuration * 100) / 100,
+      perDay: Math.round(stats.avgDailyHours * 100) / 100,
+    },
+    longestSession: {
+      hours: Math.round(ms.durationHours * 100) / 100,
+      date: ms.start.toLocaleDateString('en-CA'),
+      project: ms.project,
+    },
+    hoursByDayOfWeek,
+    topProjects,
+    streak: stats.maxStreak,
+    healthWarnings: stats.warnings.map(w => w.msg),
+    last7Days: {
+      hours: Math.round(stats.recent7Hours * 100) / 100,
+      activeDays: stats.recent7Days,
+    },
+  };
+}
+
 // ── Display ─────────────────────────────────────────────────────
 
 function display(stats) {
@@ -383,25 +426,43 @@ function display(stats) {
 // ── Main ────────────────────────────────────────────────────────
 
 async function main() {
+  const jsonMode = process.argv.includes('--json');
   const claudeDir = join(homedir(), '.claude');
 
-  process.stdout.write(`  Scanning sessions...`);
+  // In JSON mode, suppress the spinner to keep stdout clean
+  if (!jsonMode) {
+    process.stdout.write(`  Scanning sessions...`);
+  }
   const sessions = await scanSessions(claudeDir);
-  process.stdout.write(`\r                        \r`);
+  if (!jsonMode) {
+    process.stdout.write(`\r                        \r`);
+  }
 
   if (sessions.length === 0) {
-    console.log('  No Claude Code sessions found in ~/.claude/projects/');
-    console.log('  Run Claude Code at least once to generate session data.');
+    if (jsonMode) {
+      console.log(JSON.stringify({ error: 'No sessions found' }, null, 2));
+    } else {
+      console.log('  No Claude Code sessions found in ~/.claude/projects/');
+      console.log('  Run Claude Code at least once to generate session data.');
+    }
     process.exit(1);
   }
 
   const stats = analyze(sessions);
   if (!stats) {
-    console.log('  Could not analyze sessions.');
+    if (jsonMode) {
+      console.log(JSON.stringify({ error: 'Could not analyze sessions' }, null, 2));
+    } else {
+      console.log('  Could not analyze sessions.');
+    }
     process.exit(1);
   }
 
-  display(stats);
+  if (jsonMode) {
+    console.log(JSON.stringify(buildJsonOutput(stats), null, 2));
+  } else {
+    display(stats);
+  }
 }
 
 main().catch(err => {

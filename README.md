@@ -55,6 +55,35 @@ npx cc-session-stats
     → Stretch your hip flexors. They're angry. Trust me.
 ```
 
+## JSON output
+
+For CI pipelines, dashboards, or programmatic use:
+
+```
+npx cc-session-stats --json
+```
+
+Outputs structured JSON to stdout:
+
+```json
+{
+  "version": "1.0",
+  "totalSessions": 3405,
+  "totalHours": 102.12,
+  "activeDays": 47,
+  "totalDaysSpan": 50,
+  "firstSeen": "2026-01-10",
+  "lastSeen": "2026-02-28",
+  "averages": { "perSession": 0.03, "perDay": 2.17 },
+  "longestSession": { "hours": 3.89, "date": "2026-02-28", "project": "cc-loop" },
+  "hoursByDayOfWeek": { "Sun": 20.27, "Mon": 17.2, "..." : "..." },
+  "topProjects": [{ "name": "~", "hours": 89.47 }, "..."],
+  "streak": 35,
+  "healthWarnings": ["35 consecutive days of AI usage. Rest days exist for a reason."],
+  "last7Days": { "hours": 24.72, "activeDays": 8 }
+}
+```
+
 ## How it works
 
 1. Scans `~/.claude/projects/` for session transcript files (.jsonl)
