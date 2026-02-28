@@ -106,7 +106,11 @@ The tool flags concerning patterns:
 | Average session > 2 hours | 90-minute focus blocks are backed by research |
 | 6+ hours/day average | That's a full workday of sitting |
 
-## The cc-toolkit trilogy
+## Part of cc-toolkit
+
+cc-session-stats is one of 27 free tools for Claude Code users.
+
+**→ [See all 27 tools at yurukusa.github.io/cc-toolkit](https://yurukusa.github.io/cc-toolkit/)**
 
 | Tool | What it checks |
 |------|---------------|
@@ -114,11 +118,11 @@ The tool flags concerning patterns:
 | **cc-session-stats** | How much are you **using** AI? |
 | [cc-agent-load](https://github.com/yurukusa/cc-agent-load) | Is it **you** or the AI working? |
 | [cc-audit-log](https://github.com/yurukusa/cc-audit-log) | What did your AI **do**? |
-| [cc-cost-check](https://github.com/yurukusa/cc-cost-check) | Cost per commit calculator |
+| [cc-cost-check](https://yurukusa.github.io/cc-cost-check/) | Cost per commit calculator |
 | [cc-wrapped](https://yurukusa.github.io/cc-wrapped/) | Your AI year in review (Spotify Wrapped style) |
 | [cc-personality](https://github.com/yurukusa/cc-personality) | What kind of Claude Code developer are you? |
 | [cc-roast](https://yurukusa.github.io/cc-roast/) | Your CLAUDE.md, brutally honest |
-| [claude-code-hooks](https://github.com/yurukusa/claude-code-hooks) | Fix your score — 10 hooks + 5 templates |
+| [cc-ops-kit](https://yurukusa.gumroad.com/l/cc-codex-ops-kit) | Production hooks to keep autonomous Claude Code safe ($14.99) |
 
 ## License
 
