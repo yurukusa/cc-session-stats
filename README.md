@@ -2,6 +2,8 @@
 
 See how much time you actually spend with Claude Code.
 
+**Try it in your browser:** [yurukusa.github.io/cc-session-stats](https://yurukusa.github.io/cc-session-stats/)
+
 ```
 npx cc-session-stats
 ```
