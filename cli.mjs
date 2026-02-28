@@ -247,7 +247,7 @@ function analyze(sessions) {
   // Recent 7 days
   const today = new Date().toLocaleDateString('en-CA');
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toLocaleDateString('en-CA');
-  const recent7 = activeDays.filter(d => d >= sevenDaysAgo && d <= today);
+  const recent7 = activeDays.filter(d => d > sevenDaysAgo && d <= today);
   const recent7Hours = recent7.reduce((sum, d) => sum + byDate[d].hours, 0);
 
   return {
