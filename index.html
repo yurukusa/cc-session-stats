@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>cc-session-stats — See how much time you actually spend with Claude Code</title>
+  <meta name="description" content="Visualize your Claude Code session statistics. Paste your JSON data to see hours, streaks, and usage patterns.">
+  <meta property="og:title" content="cc-session-stats">
+  <meta property="og:description" content="See how much time you actually spend with Claude Code.">
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #30363d;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --cyan: #58d8f0;
+      --yellow: #f7c948;
+      --blue: #58a6ff;
+      --green: #56d364;
+      --orange: #ffa657;
+      --red: #ff7b72;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+    .container { max-width: 800px; margin: 0 auto; padding: 40px 20px; }
+    header { text-align: center; margin-bottom: 48px; }
+    header h1 { font-size: 2rem; font-weight: 700; color: var(--cyan); margin-bottom: 8px; }
+    header p { color: var(--muted); font-size: 1rem; }
+    .step-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .step-box h2 { font-size: 1rem; font-weight: 600; margin-bottom: 12px; color: var(--cyan); }
+    code {
+      background: #010409;
+      border: 1px solid var(--border);
+      padding: 12px 16px;
+      border-radius: 8px;
+      display: block;
+      font-family: 'Cascadia Code', 'Fira Code', monospace;
+      font-size: 0.9rem;
+      color: var(--green);
+      margin-bottom: 8px;
+    }
+    .copy-hint { font-size: 0.8rem; color: var(--muted); }
+    textarea {
+      width: 100%;
+      height: 120px;
+      background: #010409;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      color: var(--text);
+      font-family: monospace;
+      font-size: 0.85rem;
+      resize: vertical;
+    }
+    textarea:focus { outline: none; border-color: var(--cyan); }
+    button {
+      background: var(--cyan);
+      color: #0d1117;
+      border: none;
+      padding: 12px 32px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 12px;
+      transition: opacity 0.15s;
+    }
+    button:hover { opacity: 0.85; }
+    #result { display: none; }
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .stat-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+    }
+    .stat-box.warn { border-color: var(--orange); }
+    .stat-val { font-size: 1.8rem; font-weight: 700; color: var(--cyan); }
+    .stat-val.warn { color: var(--orange); }
+    .stat-label { font-size: 0.75rem; color: var(--muted); margin-top: 4px; }
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .section h3 { font-size: 0.9rem; color: var(--muted); margin-bottom: 14px; }
+    .dow-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+    .dow-label { width: 32px; font-size: 0.8rem; color: var(--muted); }
+    .dow-fill {
+      height: 18px;
+      background: var(--blue);
+      border-radius: 3px;
+      min-width: 2px;
+      transition: width 0.3s;
+    }
+    .dow-hours { font-size: 0.8rem; color: var(--muted); margin-left: 4px; }
+    .projects-list { list-style: none; }
+    .project-item { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .project-name { font-size: 0.85rem; min-width: 150px; color: var(--text); font-family: monospace; }
+    .project-bar {
+      height: 16px;
+      background: var(--green);
+      border-radius: 3px;
+      min-width: 2px;
+    }
+    .project-hours { font-size: 0.8rem; color: var(--muted); }
+    .warnings-list { list-style: none; }
+    .warning-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+      color: var(--orange);
+    }
+    .warning-item:last-child { border-bottom: none; }
+    .streak-display {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--yellow);
+      text-align: center;
+      padding: 8px 0;
+    }
+    .streak-sub { text-align: center; color: var(--muted); font-size: 0.85rem; margin-top: 4px; }
+    .dates-row { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--muted); margin-top: 8px; }
+    .error-msg { color: var(--red); font-size: 0.9rem; margin-top: 8px; display: none; }
+    .share-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      margin-top: 24px;
+    }
+    .share-box h3 { margin-bottom: 12px; color: var(--muted); font-size: 0.9rem; }
+    .share-btn {
+      background: #000;
+      color: #fff;
+      border: 1px solid #fff;
+      padding: 10px 24px;
+      border-radius: 24px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .share-btn:hover { background: #111; }
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.8rem;
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+    footer a { color: var(--cyan); text-decoration: none; }
+    @media (max-width: 480px) {
+      header h1 { font-size: 1.5rem; }
+      .stat-val { font-size: 1.4rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>cc-session-stats</h1>
+    <p>See how much time you actually spend with Claude Code.</p>
+  </header>
+
+  <div class="step-box">
+    <h2>Step 1 — Generate your stats</h2>
+    <code>npx cc-session-stats --json</code>
+    <p class="copy-hint">Run this in your terminal. Copy the entire JSON output.</p>
+  </div>
+
+  <div class="step-box">
+    <h2>Step 2 — Paste your JSON</h2>
+    <textarea id="jsonInput" placeholder='Paste your JSON here...'></textarea>
+    <br>
+    <button onclick="visualize()">Show my stats →</button>
+    <p class="error-msg" id="errorMsg"></p>
+  </div>
+
+  <div id="result">
+    <div class="overview-grid">
+      <div class="stat-box"><div class="stat-val" id="statSessions"></div><div class="stat-label">Total Sessions</div></div>
+      <div class="stat-box"><div class="stat-val" id="statHours"></div><div class="stat-label">Total Hours</div></div>
+      <div class="stat-box"><div class="stat-val" id="statDays"></div><div class="stat-label">Active Days</div></div>
+      <div class="stat-box"><div class="stat-val" id="statPerDay"></div><div class="stat-label">Avg Hours/Day</div></div>
+      <div class="stat-box"><div class="stat-val" id="statLast7"></div><div class="stat-label">Last 7 Days</div></div>
+    </div>
+
+    <div class="section">
+      <h3>Longest Streak</h3>
+      <div class="streak-display" id="streakDisplay"></div>
+      <div class="streak-sub" id="streakSub"></div>
+    </div>
+
+    <div class="section">
+      <h3>Hours by Day of Week</h3>
+      <div id="dowChart"></div>
+    </div>
+
+    <div class="section">
+      <h3>Top Projects</h3>
+      <ul class="projects-list" id="projectsList"></ul>
+    </div>
+
+    <div class="section" id="warningsSection" style="display:none">
+      <h3>Health Warnings</h3>
+      <ul class="warnings-list" id="warningsList"></ul>
+    </div>
+
+    <div class="section">
+      <h3>Date Range</h3>
+      <div class="dates-row">
+        <span>First seen: <strong id="firstSeen"></strong></span>
+        <span>Last seen: <strong id="lastSeen"></strong></span>
+      </div>
+    </div>
+
+    <div class="share-box">
+      <h3>Share your stats</h3>
+      <a id="shareLink" class="share-btn" target="_blank" href="#">Post on X (Twitter)</a>
+    </div>
+  </div>
+
+  <footer>
+    <p>
+      <a href="https://github.com/yurukusa/cc-session-stats">GitHub</a> ·
+      <a href="https://www.npmjs.com/package/cc-session-stats">npm</a> ·
+      Zero dependencies · Runs entirely local
+    </p>
+    <p style="margin-top: 8px;">
+      Also try: <a href="https://yurukusa.github.io/cc-personality/">cc-personality</a> ·
+      <a href="https://yurukusa.github.io/cc-wrapped/">cc-wrapped</a>
+    </p>
+  </footer>
+</div>
+
+<script>
+const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+function visualize() {
+  const raw = document.getElementById('jsonInput').value.trim();
+  const errEl = document.getElementById('errorMsg');
+  errEl.style.display = 'none';
+
+  let data;
+  try {
+    data = JSON.parse(raw);
+  } catch(e) {
+    errEl.textContent = 'Invalid JSON. Make sure you copied the full output from npx cc-session-stats --json';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  if (!data.totalSessions || !data.hoursByDayOfWeek) {
+    errEl.textContent = 'Missing required fields. Run: npx cc-session-stats --json';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  // Overview stats
+  document.getElementById('statSessions').textContent = data.totalSessions.toLocaleString();
+  document.getElementById('statHours').textContent = data.totalHours.toFixed(1) + 'h';
+  document.getElementById('statDays').textContent = data.activeDays + '/' + data.totalDaysSpan;
+  document.getElementById('statPerDay').textContent = (data.averages?.perDay || 0).toFixed(1) + 'h';
+  document.getElementById('statLast7').textContent = (data.last7Days?.hours || 0).toFixed(1) + 'h';
+
+  // Streak
+  document.getElementById('streakDisplay').textContent = data.streak + ' days';
+  document.getElementById('streakSub').textContent = 'Consecutive days of Claude Code usage';
+
+  // Day of week chart
+  const dow = data.hoursByDayOfWeek;
+  const maxDow = Math.max(...Object.values(dow));
+  const dowEl = document.getElementById('dowChart');
+  dowEl.innerHTML = '';
+  DAYS.forEach(day => {
+    const h = dow[day] || 0;
+    const row = document.createElement('div');
+    row.className = 'dow-bar';
+    row.innerHTML = `
+      <span class="dow-label">${day}</span>
+      <div class="dow-fill" style="width:${maxDow > 0 ? (h/maxDow*240) : 0}px"></div>
+      <span class="dow-hours">${h.toFixed(1)}h</span>
+    `;
+    dowEl.appendChild(row);
+  });
+
+  // Top projects
+  const projList = document.getElementById('projectsList');
+  projList.innerHTML = '';
+  const projects = (data.topProjects || []).slice(0, 8);
+  const maxProj = Math.max(...projects.map(p => p.hours));
+  projects.forEach(p => {
+    const li = document.createElement('li');
+    li.className = 'project-item';
+    li.innerHTML = `
+      <span class="project-name">${p.name}</span>
+      <div class="project-bar" style="width:${maxProj > 0 ? (p.hours/maxProj*180) : 2}px"></div>
+      <span class="project-hours">${p.hours.toFixed(1)}h</span>
+    `;
+    projList.appendChild(li);
+  });
+
+  // Health warnings
+  const warnings = data.healthWarnings || [];
+  if (warnings.length > 0) {
+    document.getElementById('warningsSection').style.display = 'block';
+    const wList = document.getElementById('warningsList');
+    wList.innerHTML = '';
+    warnings.forEach(w => {
+      const li = document.createElement('li');
+      li.className = 'warning-item';
+      li.innerHTML = `<span>⚠</span><span>${w}</span>`;
+      wList.appendChild(li);
+    });
+  }
+
+  // Dates
+  document.getElementById('firstSeen').textContent = data.firstSeen || '—';
+  document.getElementById('lastSeen').textContent = data.lastSeen || '—';
+
+  // Share link
+  const shareText = `My Claude Code stats:\n${data.totalHours.toFixed(0)}h total • ${data.totalSessions} sessions • ${data.streak}-day streak\nCheck yours: https://yurukusa.github.io/cc-session-stats/\nnpx cc-session-stats\n#claudecode`;
+  document.getElementById('shareLink').href = `https://x.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
+
+  document.getElementById('result').style.display = 'block';
+  document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
