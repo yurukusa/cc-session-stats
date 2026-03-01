@@ -12,6 +12,8 @@ import { homedir } from 'node:os';
 const SESSION_GAP_HOURS = 0.5; // 30min gap = new session within a file
 const HEALTH_WARN_SESSION_HOURS = 3;
 const HEALTH_WARN_CONSECUTIVE_DAYS = 7;
+// Sessions >8h are likely autonomous/continuous runs (cc-loop etc), not single interactive sessions
+const MAX_INTERACTIVE_SESSION_HOURS = 8;
 
 // ── Color helpers ───────────────────────────────────────────────
 
@@ -164,7 +166,13 @@ function analyze(sessions) {
 
   const totalHours = sessions.reduce((s, x) => s + x.durationHours, 0);
   const avgDuration = totalHours / sessions.length;
-  const maxSession = sessions.reduce((max, s) => s.durationHours > max.durationHours ? s : max, sessions[0]);
+  // For "Longest Session", prefer sessions under MAX_INTERACTIVE_SESSION_HOURS.
+  // Very long sessions (>8h) are typically continuous autonomous runs, not a human sitting still.
+  const interactiveSessions = sessions.filter(s => s.durationHours <= MAX_INTERACTIVE_SESSION_HOURS);
+  const maxSessionBase = interactiveSessions.length > 0 ? interactiveSessions : sessions;
+  const maxSession = maxSessionBase.reduce((max, s) => s.durationHours > max.durationHours ? s : max, maxSessionBase[0]);
+  // Track whether we filtered out any very long sessions
+  const hasAutonomousSessions = sessions.some(s => s.durationHours > MAX_INTERACTIVE_SESSION_HOURS);
 
   // Group by date (local)
   const byDate = {};
@@ -255,6 +263,7 @@ function analyze(sessions) {
     totalHours,
     avgDuration,
     maxSession,
+    hasAutonomousSessions,
     activeDays,
     totalDaysSpan,
     byDate,
@@ -321,7 +330,7 @@ function display(stats) {
   const { bold, dim, reset, red, green, yellow, blue, cyan, white, bgRed } = C;
 
   console.log('');
-  console.log(`  ${bold}${cyan}Claude Code Session Stats v1.0${reset}`);
+  console.log(`  ${bold}${cyan}Claude Code Session Stats v1.0.1${reset}`);
   console.log(`  ${'═'.repeat(39)}`);
   console.log(`  ${dim}Scanning: ~/.claude/projects/${reset}`);
   console.log('');
@@ -346,6 +355,9 @@ function display(stats) {
   const ms = stats.maxSession;
   console.log(`  ${bold}▸ Longest Session${reset}`);
   console.log(`    ${yellow}${ms.durationHours.toFixed(1)}h${reset} on ${ms.start.toLocaleDateString('en-CA')} — ${dim}${ms.project}${reset}`);
+  if (stats.hasAutonomousSessions) {
+    console.log(`    ${dim}(sessions >8h excluded — likely continuous autonomous runs)${reset}`);
+  }
   console.log('');
 
   // Day of week

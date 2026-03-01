@@ -1,6 +1,6 @@
 {
   "name": "cc-session-stats",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "See how much time you actually spend with Claude Code. Session durations, daily patterns, health warnings.",
   "bin": {
     "cc-session-stats": "cli.mjs"
