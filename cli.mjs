@@ -297,7 +297,7 @@ function buildJsonOutput(stats) {
   const ms = stats.maxSession;
 
   return {
-    version: '1.0',
+    version: '1.0.1',
     totalSessions: stats.totalSessions,
     totalHours: Math.round(stats.totalHours * 100) / 100,
     activeDays: stats.activeDays.length,
@@ -316,6 +316,7 @@ function buildJsonOutput(stats) {
     hoursByDayOfWeek,
     topProjects,
     streak: stats.maxStreak,
+    hasAutonomousSessions: stats.hasAutonomousSessions,
     healthWarnings: stats.warnings.map(w => w.msg),
     last7Days: {
       hours: Math.round(stats.recent7Hours * 100) / 100,
