@@ -108,9 +108,9 @@ The tool flags concerning patterns:
 
 ## Part of cc-toolkit
 
-cc-session-stats is one of 34 free tools for Claude Code users.
+cc-session-stats is one of 35 free tools for Claude Code users.
 
-**→ [See all 34 tools at yurukusa.github.io/cc-toolkit](https://yurukusa.github.io/cc-toolkit/)**
+**→ [See all 35 tools at yurukusa.github.io/cc-toolkit](https://yurukusa.github.io/cc-toolkit/)**
 
 | Tool | What it checks |
 |------|---------------|
