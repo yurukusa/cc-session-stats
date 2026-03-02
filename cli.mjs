@@ -35,30 +35,36 @@ function bar(pct, width = 20) {
   return '█'.repeat(filled) + '░'.repeat(width - filled);
 }
 
-// ── Read first and last line of a file ──────────────────────────
+// ── Read first and last timestamped line of a file ──────────────
 
 async function readFirstLastLine(filePath) {
   const fh = await open(filePath, 'r');
   try {
-    const buf = Buffer.alloc(8192);
-    // Read first line
-    const { bytesRead: firstBytes } = await fh.read(buf, 0, 8192, 0);
-    if (firstBytes === 0) return null;
-    const firstChunk = buf.toString('utf8', 0, firstBytes);
-    const firstNewline = firstChunk.indexOf('\n');
-    const firstLine = firstNewline >= 0 ? firstChunk.substring(0, firstNewline) : firstChunk;
-
-    // Read last line — seek to end
     const fileStat = await fh.stat();
     const fileSize = fileStat.size;
-    if (fileSize < 2) return { firstLine, lastLine: firstLine };
+    if (fileSize < 2) return null;
 
+    // Read first 64KB to find the first line with a timestamp.
+    // Sessions often start with file-history-snapshot (no timestamp) — skip past it.
+    const headSize = Math.min(65536, fileSize);
+    const headBuf = Buffer.alloc(headSize);
+    const { bytesRead: headBytes } = await fh.read(headBuf, 0, headSize, 0);
+    const headChunk = headBuf.toString('utf8', 0, headBytes);
+    const headLines = headChunk.split('\n').filter(l => l.trim());
+
+    let firstLine = null;
+    for (const line of headLines) {
+      if (parseTimestamp(line)) { firstLine = line; break; }
+    }
+    if (!firstLine) return null;
+
+    // Read last line — seek to end
     const readSize = Math.min(65536, fileSize);
     const tailBuf = Buffer.alloc(readSize);
     const { bytesRead: tailBytes } = await fh.read(tailBuf, 0, readSize, fileSize - readSize);
     const tailChunk = tailBuf.toString('utf8', 0, tailBytes);
-    const lines = tailChunk.split('\n').filter(l => l.trim());
-    const lastLine = lines[lines.length - 1] || firstLine;
+    const tailLines = tailChunk.split('\n').filter(l => l.trim());
+    const lastLine = tailLines[tailLines.length - 1] || firstLine;
 
     return { firstLine, lastLine };
   } finally {
