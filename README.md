@@ -108,9 +108,9 @@ The tool flags concerning patterns:
 
 ## Part of cc-toolkit
 
-cc-session-stats is one of 36 free tools for Claude Code users.
+cc-session-stats is one of 100+ free tools for Claude Code users.
 
-**→ [See all 36 tools at yurukusa.github.io/cc-toolkit](https://yurukusa.github.io/cc-toolkit/)**
+**→ [See all cc-toolkit tools](https://yurukusa.github.io/cc-toolkit/)**
 
 | Tool | What it checks |
 |------|---------------|
@@ -122,7 +122,11 @@ cc-session-stats is one of 36 free tools for Claude Code users.
 | [cc-wrapped](https://yurukusa.github.io/cc-wrapped/) | Your AI year in review (Spotify Wrapped style) |
 | [cc-personality](https://github.com/yurukusa/cc-personality) | What kind of Claude Code developer are you? |
 | [cc-roast](https://yurukusa.github.io/cc-roast/) | Your CLAUDE.md, brutally honest |
-| [cc-ops-kit](https://yurukusa.gumroad.com/l/cc-codex-ops-kit) | Production hooks to keep autonomous Claude Code safe ($19) |
+| [cc-ops-kit](https://yurukusa.github.io/cc-ops-kit-landing/?utm_source=github&utm_medium=readme&utm_campaign=cc-session-stats) | Production hooks to keep autonomous Claude Code safe ($19) |
+
+### Want more than stats? Make your sessions safer.
+
+**[Claude Code Ops Kit](https://yurukusa.github.io/cc-ops-kit-landing/?utm_source=github&utm_medium=readme&utm_campaign=cc-session-stats)** ($19) — 10 production hooks + 6 templates + 3 tools. Built from 140+ hours of autonomous operation.
 
 ## License
 
