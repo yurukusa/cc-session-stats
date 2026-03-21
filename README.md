@@ -128,7 +128,7 @@ cc-session-stats is one of 100+ free tools for Claude Code users.
 
 **Quick safety setup:** `npx cc-safe-setup` — 7 hooks in 10 seconds (free). [GitHub](https://github.com/yurukusa/cc-safe-setup)
 
-**[Claude Code Ops Kit](https://yurukusa.github.io/cc-ops-kit-landing/?utm_source=github&utm_medium=readme&utm_campaign=cc-session-stats)** — 16 production hooks + 6 templates + 3 tools. Built from 160+ hours of autonomous operation.
+**[Claude Code Ops Kit](https://yurukusa.github.io/cc-ops-kit-landing/?utm_source=github&utm_medium=readme&utm_campaign=cc-session-stats)** — 16 production hooks + 5 templates + 3 tools. Built from 160+ hours of autonomous operation.
 
 ## License
 
