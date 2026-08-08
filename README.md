@@ -110,7 +110,7 @@ The tool flags concerning patterns:
 
 cc-session-stats is one of 100+ free tools for Claude Code users.
 
-**→ [See all cc-toolkit tools](https://yurukusa.github.io/cc-toolkit/)**
+**→ [See all tools](https://yurukusa.github.io/cc-safe-setup/hub.html)**
 
 | Tool | What it checks |
 |------|---------------|
@@ -118,10 +118,9 @@ cc-session-stats is one of 100+ free tools for Claude Code users.
 | **cc-session-stats** | How much are you **using** AI? |
 | [cc-agent-load](https://github.com/yurukusa/cc-agent-load) | Is it **you** or the AI working? |
 | [cc-audit-log](https://github.com/yurukusa/cc-audit-log) | What did your AI **do**? |
-| [cc-cost-check](https://yurukusa.github.io/cc-cost-check/) | Cost per commit calculator |
-| [cc-wrapped](https://yurukusa.github.io/cc-wrapped/) | Your AI year in review (Spotify Wrapped style) |
+| [Cost Calculator](https://yurukusa.github.io/cc-safe-setup/cost-calculator.html) | Cost per commit calculator |
 | [cc-personality](https://github.com/yurukusa/cc-personality) | What kind of Claude Code developer are you? |
-| [cc-roast](https://yurukusa.github.io/cc-roast/) | Your CLAUDE.md, brutally honest |
+| [CLAUDE.md Analyzer](https://yurukusa.github.io/cc-safe-setup/claudemd-analyzer.html) | Your CLAUDE.md, brutally honest |
 | [cc-ops-kit](https://yurukusa.github.io/cc-ops-kit-landing/?utm_source=github&utm_medium=readme&utm_campaign=cc-session-stats) | Production hooks to keep autonomous Claude Code safe ($19) |
 
 ### Want more than stats? Make your sessions safer.
